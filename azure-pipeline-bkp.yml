@@ -1,0 +1,24 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: AzureCLI@2
+    displayName: 'Check Words in File'
+    inputs:
+      azureSubscription: 'Free Trial(d3a9cbf1-5e2c-40cc-a477-0da2225fa353)'
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        # Download the file from Azure Blob Storage
+        az storage blob download  --account-name terraformnew --container-name newjson --name worklioinfr.json --file filename.txt --output none
+        # Check if words are present in the file
+        if grep -q "nothing\|somting" filename.txt; then
+          echo "Words found in file. Triggering Terraform script..."
+        else
+          echo "Words not found in file. Skipping Terraform script execution."
+        fi
